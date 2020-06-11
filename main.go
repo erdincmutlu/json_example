@@ -21,7 +21,7 @@ func TryUnmarshal(b []byte) error {
 		return err
 	}
 
-	fmt.Printf("Out:%+v\n", out)
+	fmt.Printf("Unmarshalled: %+v\n", out)
 	return nil
 }
 
@@ -31,7 +31,7 @@ func TryMarshal(in MyStruct) ([]byte, error) {
 		return []byte{}, err
 	}
 
-	fmt.Printf("b:%+v\n", b)
+	fmt.Printf("Marshalled: %s\n", string(b))
 	return b, nil
 }
 
@@ -63,22 +63,36 @@ func (c *CustomTime) UnmarshalJSON(b []byte) error {
 type PaymentType string
 
 const (
-	PaymentTypeCredit PaymentType = "Credit"
-	PaymentTypeDebit  PaymentType = "Debit"
+	PaymentTypeCredit  PaymentType = "Credit"
+	PaymentTypeDebit   PaymentType = "Debit"
+	PaymentTypeUnknown PaymentType = "Unknown"
 )
 
 var paymentTypeNames = map[PaymentType]string{
-	PaymentTypeCredit: "Credit",
-	PaymentTypeDebit:  "Debit",
+	PaymentTypeCredit:  "Credit",
+	PaymentTypeDebit:   "Debit",
+	PaymentTypeUnknown: "Unknown",
 }
 
-func (n PaymentType) String() string {
-	if name, ok := paymentTypeNames[n]; ok {
+func (p PaymentType) String() string {
+	if name, ok := paymentTypeNames[p]; ok {
 		return name
 	}
 	return "Unknown"
 }
 
-func (v PaymentType) MarshalJSON() ([]byte, error) {
-	return json.Marshal(v.String()[:1])
+func (p PaymentType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(p.String()[:1])
+}
+
+func (p *PaymentType) UnmarshalJSON(b []byte) error {
+	switch string(b) {
+	case `"C"`:
+		*p = PaymentTypeCredit
+	case `"D"`:
+		*p = PaymentTypeDebit
+	default:
+		*p = PaymentTypeUnknown
+	}
+	return nil
 }
