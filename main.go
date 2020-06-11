@@ -14,15 +14,15 @@ type MyStruct struct {
 	Type          PaymentType `json:"type"`
 }
 
-func TryUnmarshal(b []byte) error {
+func TryUnmarshal(b []byte) (MyStruct, error) {
 	var out MyStruct
 	err := json.Unmarshal(b, &out)
 	if err != nil {
-		return err
+		return MyStruct{}, err
 	}
 
 	fmt.Printf("Unmarshalled: %+v\n", out)
-	return nil
+	return out, nil
 }
 
 func TryMarshal(in MyStruct) ([]byte, error) {

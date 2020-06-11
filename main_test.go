@@ -11,12 +11,20 @@ func TestTryUnmarshal(t *testing.T) {
 	data := []byte(`{	
 		"accountNumber":"123456789",
 		"createAt": "2020-05-27T01:02:03Z01:00",
-		"updatedAt": "",
-		"clearedAt": "2020-05-28",
+		"updatedAt": "2020-05-28",
+		"clearedAt": "",
 		"type": "C"
 		}`)
-	err := TryUnmarshal(data)
+	exp := MyStruct{
+		AccountNumber: "123456789",
+		CreatedAt:     time.Time{},
+		UpdatedAt:     CustomTime{time.Date(2020, 5, 28, 0, 0, 0, 0, time.UTC)},
+		ClearedAt:     CustomTime{},
+		Type:          "Credit",
+	}
+	out, err := TryUnmarshal(data)
 	require.NoError(t, err)
+	require.Equal(t, exp, out)
 }
 
 func TestTryMarshal(t *testing.T) {
